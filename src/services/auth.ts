@@ -5,25 +5,44 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   sendEmailVerification,
+  updateProfile,
 } from 'firebase/auth';
 
-export async function registerWithEmail(email: string, password: string) {
+auth.languageCode = 'es';
+
+interface RegisterProps {
+  registerEmail: string;
+  registerPassword: string;
+  displayName: string;
+}
+
+interface LoginProps {
+  loginEmail: string;
+  loginPassword: string;
+}
+
+export async function registerWithEmail({
+  registerEmail,
+  registerPassword,
+  displayName,
+}: RegisterProps) {
   try {
     const { user } = await createUserWithEmailAndPassword(
       auth,
-      email,
-      password
+      registerEmail,
+      registerPassword
     );
-    sendEmailVerification(user);
+    await updateProfile(user, { displayName });
+    await sendEmailVerification(user);
     return { user };
   } catch (error) {
     return { error };
   }
 }
 
-export async function loginWithEmail(email: string, password: string) {
+export async function loginWithEmail({ loginEmail, loginPassword }: LoginProps) {
   try {
-    const { user } = await signInWithEmailAndPassword(auth, email, password);
+    const { user } = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
     return { user };
   } catch (error) {
     return { error };
